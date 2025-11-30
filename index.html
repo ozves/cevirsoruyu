@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sindirim Sistemi Çarkıfelek</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            width: 100%;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                #3498db 0deg 30deg,
+                #e74c3c 30deg 60deg,
+                #2ecc71 60deg 90deg,
+                #f39c12 90deg 120deg,
+                #9b59b6 120deg 150deg,
+                #1abc9c 150deg 180deg,
+                #3498db 180deg 210deg,
+                #e74c3c 210deg 240deg,
+                #2ecc71 240deg 270deg,
+                #f39c12 270deg 300deg,
+                #9b59b6 300deg 330deg,
+                #1abc9c 330deg 360deg
+            );
+            transition: transform 3s cubic-bezier(0.2, 0.8, 0.3, 1);
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .wheel.spinning {
+            transform: rotate(3600deg);
+        }
+
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: #e74c3c;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            z-index: 10;
+        }
+
+        .spin-button {
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+
+        .spin-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        .spin-button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .question-card {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            text-align: center;
+            display: none;
+        }
+
+        .question-card.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            line-height: 1.5;
+        }
+
+        .answer-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #3498db;
+        }
+
+        .answer-text {
+            font-size: 1.3rem;
+            color: #27ae60;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .show-answer {
+            padding: 12px 25px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .show-answer:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .next-question {
+            padding: 12px 25px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .next-question:hover {
+            background: #219a52;
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            color: white;
+            font-size: 1.1rem;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Mobile optimizasyonları */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .wheel-container {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .question-text {
+                font-size: 1.2rem;
+            }
+            
+            .answer-text {
+                font-size: 1.1rem;
+            }
+            
+            .spin-button {
+                padding: 15px 30px;
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .wheel-container {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .question-card {
+                padding: 20px;
+            }
+            
+            .question-text {
+                font-size: 1.1rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-gamepad"></i> Sindirim Sistemi Çarkıfelek</h1>
+        
+        <div class="game-container">
+            <div class="wheel-container">
+                <div class="pointer"></div>
+                <div class="wheel" id="wheel"></div>
+            </div>
+            
+            <button class="spin-button" id="spin-btn">
+                <i class="fas fa-redo-alt"></i> ÇARKI ÇEVİR
+            </button>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <i class="fas fa-question-circle"></i>
+                    Kalan Soru: <span id="remaining-questions">0</span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-check-circle"></i>
+                    Cevaplanan: <span id="answered-questions">0</span>
+                </div>
+            </div>
+            
+            <div class="question-card" id="question-card">
+                <div class="question-text" id="question-text">Soru buraya gelecek</div>
+                <div class="answer-section">
+                    <button class="show-answer" id="show-answer-btn">
+                        <i class="fas fa-eye"></i> Cevabı Göster
+                    </button>
+                    <div class="answer-text" id="answer-text" style="display: none;"></div>
+                    <button class="next-question" id="next-question-btn" style="display: none;">
+                        <i class="fas fa-arrow-right"></i> Sonraki Soru
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CSV verilerini JavaScript dizisine dönüştürme
+        const csvData = `"Büyük moleküllü besin maddelerinin (karbonhidrat, yağ, protein) yapı taşlarına parçalanarak hücre zarından geçebilecek hâle gelmesi sürecine ne denir?",Sindirim.
+Besinlerin fiziksel olarak küçük parçalara ayrılmasına ne ad verilir ve bu süreçte enzim kullanılır mı?,Mekanik sindirim denir ve enzim kullanılmaz.
+"Dişlerle çiğneme, midedeki kas hareketleri ve yağların safrayla küçük damlacıklara ayrılması ne tür bir sindirimdir?",Mekanik sindirim.
+Büyük moleküllü besinlerin su ve enzimler kullanılarak hidrolizle yapı taşlarına ayrışmasına ne denir?,Kimyasal sindirim.
+Kimyasal sindirim gerçekleştiği yere göre hangi iki gruba ayrılır?,Hücre içi sindirim ve hücre dışı sindirim.
+Besinlerin endositozla hücre içine alınıp koful içinde lizozom enzimleri ile parçalanması hangi sindirim türüdür?,Hücre içi sindirim.
+İnsanda akyuvar hücrelerinin mikroorganizmaları yok etmesi hangi sindirim türüne örnektir?,Hücre içi sindirim.
+"Hücreden salgılanan enzimlerle besinlerin hücre dışında parçalanıp, oluşan küçük moleküllerin hücreye alınması hangi sindirim türüdür?",Hücre dışı sindirim.
+Etçil omurgalıların midelerinin en belirgin özelliği nedir?,Öğünler arasında uzun süre bekleyebilmek için genişleyebilme özelliğine sahip olması.
+Koyun gibi geviş getiren otçul bir hayvanın midesi kaç bölmeden oluşur ve bu bölmeler nelerdir?,"Dört bölmeden oluşur: işkembe, börkenek, kırkbayır ve şirden."
+Geviş getiren otçullarda selülozun sindirimi nasıl gerçekleşir?,İşkembe ve börkenekte yaşayan mikroorganizmaların ürettiği enzimler aracılığıyla gerçekleşir.
+Etçil (karnivor) hayvanların diş yapısı avlanma ve beslenmeye nasıl adapte olmuştur?,"Avlarını yakalayıp öldürmek ve et parçalarını koparmak için büyük, sivri kesici dişlere ve köpek dişlerine sahiptirler."
+Otçul (herbivor) hayvanların azı dişlerinin temel özelliği nedir?,Sert bitkisel materyalleri öğütmek için geniş ve çıkıntılı yüzeylere sahiptir.
+İnsan gibi hepçil (omnivor) canlıların diş yapısı nasıldır?,"Hem bitkisel hem de hayvansal besinleri tüketmeye uygun olarak kesici, köpek ve azı dişlerine sahiptir."
+Kuşların sindirim sisteminde dişlerin yerini ne almıştır?,"Dişleri yoktur, ağızları gaga şeklindedir."
+Kuşlarda besinlerin geçici olarak depo edildiği ve yumuşatıldığı sindirim sistemi bölümü hangisidir?,Kursak.
+Kuşlarda besinlerin mekanik sindiriminin başladığı kaslı mide bölümü hangisidir?,Taşlık.
+"Bazı canlı gruplarında sindirim, üreme ve boşaltım sistemlerinin dışarıya açıldığı ortak açıklığa ne denir?",Kloak.
+"Otçul ve hepçillerin sindirim kanalı, etçillere kıyasla neden daha uzundur?",Selüloz içeren bitkisel besinlerin sindirimi daha zor olduğu için sindirime daha fazla zaman tanımak ve emilim yüzey alanını artırmak için.
+Geviş getirme nedir?,İşkembe ve börkenekteki besinlerin tekrar ağıza getirilerek yeniden çiğnenmesi olayıdır.
+"Geviş getiren memelilerde, besinlerdeki suyun büyük bir kısmının uzaklaştırıldığı mide bölümü hangisidir?",Kırkbayır.
+"Geviş getiren memelilerde, ineğin kendi enzimleriyle kimyasal sindirimin devam ettiği mide bölümü hangisidir?",Şirden.
+At ve tavşan gibi geviş getirmeyen otçullarda selüloz sindirimi nerede gerçekleşir?,Kör bağırsakta bulunan mikroorganizmalar sayesinde gerçekleşir.
+İnsanda sindirim sistemi hangi iki ana kısımdan oluşur?,"Sindirim kanalı (ağız, yutak, yemek borusu, mide, bağırsaklar, anüs) ve sindirime yardımcı organlar (karaciğer, pankreas, safra kesesi)."
+İnsanda karbonhidratların kimyasal sindirimi nerede başlar?,"Ağızda, tükürükte bulunan enzimle başlar."
+İnsanda proteinlerin kimyasal sindirimi nerede başlar?,Midede başlar.
+Mide öz suyunda bulunan ve proteinlerin denatürasyonuna neden olan kuvvetli asit nedir?,Hidroklorik asit (HCl).
+Midenin kendi kendini sindirmesini engelleyen salgı nedir?,Mukus.
+İnsanda yağların sindirimi nerede başlar ve biter?,İnce bağırsakta başlar ve biter.
+"Karaciğerin ürettiği, safra kesesinde depolanan ve yağların mekanik sindirimini sağlayan sıvı nedir?",Safra.
+Safra sıvısında sindirim enzimi bulunur mu?,"Hayır, safrada sindirim enzimi bulunmaz."
+"Yağ, karbonhidrat ve proteinleri sindiren enzimleri içeren ve mideden gelen asitli içeriği nötralize eden salgıyı hangi organ üretir?",Pankreas (pankreas öz suyu).
+İnsanda kimyasal sindirimin büyük kısmının gerçekleştiği ve besinlerin emildiği organ hangisidir?,İnce bağırsak.
+İnce bağırsağın iç yüzey alanını artıran parmak şeklindeki çıkıntılara ne ad verilir?,Villus.
+Villusları oluşturan epitel hücrelerinin bağırsak boşluğuna bakan yüzeyindeki sitoplazmik uzantılara ne denir?,Mikrovillus.
+Sindirilen besinlerin sindirim kanalından kana veya lenfe geçişine ne ad verilir?,Emilim.
+"Glikoz, amino asitler, B ve C vitaminleri ince bağırsaktan emildikten sonra hangi dolaşım sistemine katılır?",Kan dolaşımına katılır.
+"Yağ asitleri ve gliserol, bağırsak epitel hücrelerinde birleşip proteinle kaplandıktan sonra hangi yapıyı oluşturur?",Şilomikron.
+"Şilomikronlar ve yağda çözünen vitaminler (A, D, E, K) ince bağırsaktan emildikten sonra hangi dolaşım sistemine katılır?",Lenf dolaşımına katılır.
+Kalın bağırsağın temel görevleri nelerdir?,Suyun ve minerallerin geri emilimini sağlamak ve burada yaşayan bakterilerin ürettiği B ve K vitaminlerini emmek.
+Kan yoluyla emilen besinlerin vücuda dağıtılmadan önce uğradığı ilk organ hangisidir?,Karaciğer.
+Karbonhidratların kimyasal sindirimi sonucunda oluşan yapı birimi nedir?,Monosakkaritler (örneğin glikoz).
+Proteinlerin kimyasal sindirimi sonucunda oluşan yapı birimi nedir?,Amino asitler.
+Nötral yağların kimyasal sindirimi sonucunda oluşan yapı birimleri nelerdir?,Yağ asitleri ve gliserol.
+Midede proteinleri küçük polipeptitlere parçalayan enzimin aktifleşmesini sağlayan nedir?,Hidroklorik asit (HCl).
+"İnce bağırsakta _____ ve _____ gibi yapılar, besin emilimi için yüzey alanını yaklaşık 200-300 m²'ye çıkarır.","villus, mikrovillus"
+"Tükürükte bulunan enzim, _____ ve _____ gibi polisakkaritleri parçalamaya başlar.","nişasta, glikojen"
+"Pankreas öz suyunda bulunan _____ iyonları, mideden gelen asidik kimusu nötralize eder.",bikarbonat
+Geviş getiren hayvanlarda selülozu sindiren enzimler _____ tarafından üretilir.,mikroorganizmalar
+Kalın bağırsakta yaşayan bakteriler tarafından üretilen ve emilen vitaminler hangileridir?,B ve K vitaminleri.
+"Hücreler, sindirimle elde edilen besin maddelerinden hücresel solunum yoluyla ne üretir?",ATP (Adenozin Trifosfat).
+"İnsan, ayı ve fare gibi hem bitkisel hem de hayvansal besinler tüketen canlılar beslenme tipine göre nasıl adlandırılır?",Hepçil (omnivor).
+Köpek ve kedi gibi sadece hayvansal besinler tüketen canlılar beslenme tipine göre nasıl adlandırılır?,Etçil (karnivor).
+"At, geyik ve inek gibi sadece bitkisel besinler tüketen canlılar beslenme tipine göre nasıl adlandırılır?",Otçul (herbivor).
+İnsanlarda ve etçil memelilerde bulunan mide yapısı hangisidir?,Tek bölmeli mide.
+"Besinlerin alınması, sindirim, emilim ve atıkların uzaklaştırılması vücutta hangi temel süreci oluşturur?",Beslenme sürecini.
+Besinlerle mideye ulaşan bakteriler hangi mekanizma sayesinde yok edilir?,Midenin yüksek asidik ortamı (HCl) sayesinde yok edilir.`;
+
+        // CSV'yi işleme ve flashcard'ları oluşturma
+        const lines = csvData.split('\n');
+        let flashcards = lines.map(line => {
+            let parts = [];
+            let inQuotes = false;
+            let currentPart = '';
+            
+            for (let i = 0; i < line.length; i++) {
+                if (line[i] === '"') {
+                    inQuotes = !inQuotes;
+                } else if (line[i] === ',' && !inQuotes) {
+                    parts.push(currentPart);
+                    currentPart = '';
+                } else {
+                    currentPart += line[i];
+                }
+            }
+            parts.push(currentPart);
+            
+            const question = parts[0].replace(/^"|"$/g, '').trim();
+            const answer = parts[1].replace(/^"|"$/g, '').trim();
+            
+            return { question, answer, used: false };
+        });
+
+        // DOM elementlerini seçme
+        const wheel = document.getElementById('wheel');
+        const spinBtn = document.getElementById('spin-btn');
+        const questionCard = document.getElementById('question-card');
+        const questionText = document.getElementById('question-text');
+        const answerText = document.getElementById('answer-text');
+        const showAnswerBtn = document.getElementById('show-answer-btn');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const remainingQuestions = document.getElementById('remaining-questions');
+        const answeredQuestions = document.getElementById('answered-questions');
+
+        let usedQuestions = 0;
+        const totalQuestions = flashcards.length;
+
+        // İlk istatistikleri güncelle
+        updateStats();
+
+        function updateStats() {
+            remainingQuestions.textContent = totalQuestions - usedQuestions;
+            answeredQuestions.textContent = usedQuestions;
+        }
+
+        function getRandomQuestion() {
+            const unusedQuestions = flashcards.filter(card => !card.used);
+            
+            if (unusedQuestions.length === 0) {
+                // Tüm sorular kullanıldıysa sıfırla
+                flashcards.forEach(card => card.used = false);
+                usedQuestions = 0;
+                return getRandomQuestion();
+            }
+            
+            const randomIndex = Math.floor(Math.random() * unusedQuestions.length);
+            const selectedQuestion = unusedQuestions[randomIndex];
+            
+            // Soruyu kullanıldı olarak işaretle
+            selectedQuestion.used = true;
+            usedQuestions++;
+            updateStats();
+            
+            return selectedQuestion;
+        }
+
+        function showQuestion(questionObj) {
+            questionText.textContent = questionObj.question;
+            answerText.textContent = questionObj.answer;
+            
+            // Cevabı gizle
+            answerText.style.display = 'none';
+            nextQuestionBtn.style.display = 'none';
+            showAnswerBtn.style.display = 'block';
+            
+            // Kartı göster
+            questionCard.classList.add('active');
+        }
+
+        // Çarkı çevirme fonksiyonu
+        spinBtn.addEventListener('click', () => {
+            // Çarkı döndür
+            wheel.classList.add('spinning');
+            spinBtn.disabled = true;
+            
+            // 3 saniye sonra rastgele bir soru göster
+            setTimeout(() => {
+                wheel.classList.remove('spinning');
+                const randomQuestion = getRandomQuestion();
+                showQuestion(randomQuestion);
+                spinBtn.disabled = false;
+            }, 3000);
+        });
+
+        // Cevabı gösterme butonu
+        showAnswerBtn.addEventListener('click', () => {
+            answerText.style.display = 'block';
+            nextQuestionBtn.style.display = 'block';
+            showAnswerBtn.style.display = 'none';
+        });
+
+        // Sonraki soru butonu
+        nextQuestionBtn.addEventListener('click', () => {
+            questionCard.classList.remove('active');
+            
+            // Kısa bir bekleme süresi sonra kartı tamamen gizle
+            setTimeout(() => {
+                // Bir sonraki çeviri için hazır
+            }, 500);
+        });
+
+        // İlk başta çarkı göster, soruyu gizle
+        questionCard.classList.remove('active');
+    </script>
+</body>
+</html>
