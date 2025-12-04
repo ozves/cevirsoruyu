@@ -1049,19 +1049,18 @@ window.toggleSort = (col) => {
     }, 500);
 
 } catch (e) {
-    // ... Hata bloğu ...
-            } catch (e) { document.getElementById('mainContentArea').innerHTML = `<div class="text-center text-red-500 py-10"><p class="font-bold">Veriler alınırken hata oluştu.</p><p class="text-sm">${e.message}</p><button onclick="location.reload()" class="mt-4 button bg-gray-200 px-4 py-2 rounded">Tekrar Dene</button></div>`; }
-        
 
-        window.downloadSimplePDF = function() {
-            try { if (!window.jspdf || !window.jspdf.jsPDF) return alert('PDF modülü yüklenmedi.'); const { jsPDF } = window.jspdf; const doc = new jsPDF();
-                const name = document.querySelector('h1.text-xl') ? document.querySelector('h1.text-xl').textContent.trim() : 'Ogrenci';
-                const score = document.querySelector('.text-indigo-800') ? document.querySelector('.text-indigo-800').textContent.trim() : '0';
-                doc.setFontSize(18); doc.setTextColor(40, 40, 40); doc.text("SINAV SONUC BELGESI", 105, 20, { align: 'center' });
-                doc.autoTable({ startY: 30, head: [['Ogrenci Bilgileri', 'Sinav Detaylari']], body: [[`Ad Soyad: ${name}`, `Tarih: ${new Date().toLocaleDateString('tr-TR')}`], [`Puan: ${score}`, `Sistem: Online`]], theme: 'grid', headStyles: { fillColor: [79, 70, 229] } });
-                doc.save(`${name}_Sonuc.pdf`);
-            } catch (error) { alert('PDF Hatası: ' + error.message); }
-        };
+    // ... Hata bloğu (istersen burayı doldurursun) ...
+
+    document.getElementById('mainContentArea').innerHTML = `
+        <div class="text-center text-red-500 py-10">
+            <p class="font-bold">Veriler alınırken hata oluştu.</p>
+            <p class="text-sm">${e.message}</p>
+            <button onclick="location.reload()" class="mt-4 button bg-gray-200 px-4 py-2 rounded">
+                Tekrar Dene
+            </button>
+        </div>`;
+}
         // --- ÖĞRENCİ VERİ YENİLEME FONKSİYONU (YENİ) ---
         window.refreshStudentResult = async function() {
             const btn = document.getElementById('refreshStudentBtn');
