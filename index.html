@@ -1051,7 +1051,7 @@ window.toggleSort = (col) => {
 } catch (e) {
     // ... Hata bloğu ...
             } catch (e) { document.getElementById('mainContentArea').innerHTML = `<div class="text-center text-red-500 py-10"><p class="font-bold">Veriler alınırken hata oluştu.</p><p class="text-sm">${e.message}</p><button onclick="location.reload()" class="mt-4 button bg-gray-200 px-4 py-2 rounded">Tekrar Dene</button></div>`; }
-        }
+        
 
         window.downloadSimplePDF = function() {
             try { if (!window.jspdf || !window.jspdf.jsPDF) return alert('PDF modülü yüklenmedi.'); const { jsPDF } = window.jspdf; const doc = new jsPDF();
